@@ -39,7 +39,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   onPressed: () {},
                   child: Text((isExpense) ? "Add Expense" : "Add Income"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: (isExpense) ? Colors.red : Colors.green,
                     foregroundColor: Colors.white,
                     textStyle: TextStyle(fontSize: 12),
                   ),
@@ -116,7 +116,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       Icons.download,
                       color: Colors.green,
                     ),
-              title: Text("Sedekah"),
+              title: Text("Upgrade To Premium"),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

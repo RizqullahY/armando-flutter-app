@@ -1,8 +1,10 @@
 import 'package:calendar_appbar/calendar_appbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/pages/category_page.dart';
 import 'package:myapp/pages/home_page.dart';
+import 'package:myapp/pages/transaction_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -43,10 +45,13 @@ class _MainPageState extends State<MainPage> {
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 36, horizontal: 16),
-                  child: Text("Categories" , style: GoogleFonts.montserrat(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),),
+                  child: Text(
+                    "Categories",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
               preferredSize: Size.fromHeight(100),
@@ -56,9 +61,17 @@ class _MainPageState extends State<MainPage> {
       body: _children[currentIndex],
 
       floatingActionButton: Visibility(
-        visible: ( currentIndex == 0 ), //* Visible saat index = 0 (Home)
+        visible: (currentIndex == 0), //* Visible saat index = 0 (Home)
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(
+              builder: (context) => TransactionPage(),
+            ))
+                .then((value) {
+              setState(() {});
+            });
+          },
           backgroundColor: Colors.green,
           child: const Icon(Icons.add),
         ),
