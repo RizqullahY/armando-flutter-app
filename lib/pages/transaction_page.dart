@@ -13,6 +13,8 @@ class _TransactionPageState extends State<TransactionPage> {
   bool isExpense = true;
   List<String> categories = ['Sedekah', 'Upgrade To Premium'];
   late String selectedCategory = categories.first;
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:4066365682.
+  TextEditingController dateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +110,8 @@ class _TransactionPageState extends State<TransactionPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
+                    readOnly: true,
+                    controller: dateController,
                     decoration: InputDecoration(labelText: 'Enter Date'),
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
@@ -117,10 +121,26 @@ class _TransactionPageState extends State<TransactionPage> {
                         lastDate: DateTime(2101),
                       );
                       if (pickedDate != null) {
-                        String formattedDate = DateFormat('yyyy-MM-dd')
-                            .format(pickedDate);
+                        String formattedDate =
+                            DateFormat('yyyy-MM-dd').format(pickedDate);
+                        dateController.text = formattedDate;
                       }
                     }),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isExpense ? Colors.red : Colors.green,
+                  ),
+                  child: const Text(
+                    "Submit",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               )
             ],
           ),

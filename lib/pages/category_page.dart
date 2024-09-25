@@ -1,5 +1,7 @@
+import 'package:drift/extensions/native.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/models/database.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -10,10 +12,26 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   bool isExpense = true;
+  final AppDb database = AppDb();
+  TextEditingController categoryNameController = TextEditingController();
+
+  Future insert(String name, int type) async {
+    DateTime now = DateTime.now();
+    await database.into(database.categories).insertReturning(
+          CategoriesCompanion.insert(
+            name: Value(name), // Menggunakan Value() karena menggunakan Drift
+            type: Value(type as String), // Tipe 1 untuk Income, 2 untuk Expense
+            createdAt: Value(now as String),
+            updatedAt: Value(now as String),
+          ),
+        );
+  }
+
+  Future<List<Category>> getAllCategory(int type, {required int}) async {
+    return await database.getAllCategoryRepo(type);
+  }
 
   void openDialog() {
-    // Suggested code may be subject to a license. Learn more: ~LicenseLog:2255319808.
-    // Suggested code may be subject to a license. Learn more: ~LicenseLog:4232449255.
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -29,6 +47,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   height: 10,
                 ),
                 TextFormField(
+                  controller: categoryNameController,
                   decoration: InputDecoration(
                       hintText: "Category Name", border: OutlineInputBorder()),
                 ),
@@ -36,7 +55,14 @@ class _CategoryPageState extends State<CategoryPage> {
                   height: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    final categoryName = categoryNameController.text;
+                    if (categoryName.isNotEmpty) {
+                      insert(categoryName, (isExpense) ? 2 : 1);
+                      Navigator.of(context).pop();
+                      setState(() {});
+                    }
+                  },
                   child: Text((isExpense) ? "Add Expense" : "Add Income"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (isExpense) ? Colors.red : Colors.green,
@@ -83,51 +109,56 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
 
         //* List Category
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Card(
-            elevation: 10,
-            child: ListTile(
-              leading: (isExpense)
-                  ? Icon(Icons.upload, color: Colors.red)
-                  : Icon(
-                      Icons.download,
-                      color: Colors.green,
-                    ),
-              title: Text("Sedekah"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Card(
-            elevation: 10,
-            child: ListTile(
-              leading: (isExpense)
-                  ? Icon(Icons.upload, color: Colors.red)
-                  : Icon(
-                      Icons.download,
-                      color: Colors.green,
-                    ),
-              title: Text("Upgrade To Premium"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
-                ],
-              ),
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16),
+        //   child: Card(
+        //     elevation: 10,
+        //     child: ListTile(
+        //       leading: (isExpense)
+        //           ? Icon(Icons.upload, color: Colors.red)
+        //           : Icon(
+        //               Icons.download,
+        //               color: Colors.green,
+        //             ),
+        //       title: Text("Sedekah"),
+        //       trailing: Row(
+        //         mainAxisSize: MainAxisSize.min,
+        //         children: [
+        //           IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+        //           IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ),
+
+        FutureBuilder<List<Category>>(
+            future: getAllCategory((isExpense) ? 2 : 1, int: null),
+            builder: (context, snapshot) {
+              //* Setiap Output Harus Ada Return-nya
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.length > 0) {
+                    return Center(
+                        child: Text(snapshot.data!.length.toString as String));
+                  } else {
+                    return Center(
+                      child: Text("Has No Data"),
+                    );
+                  }
+                } else {
+                  return Center(
+                    child: Text("Has No Data"),
+                  );
+                }
+              }
+            }),
       ],
     ));
   }
+
+  Value(String name) {}
 }
